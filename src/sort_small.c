@@ -1,0 +1,103 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   sort_small.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gelgasim <gelgasim@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/11/11 14:28:41 by gelgasim          #+#    #+#             */
+/*   Updated: 2026/11/18 14:29:55 by gelgasim         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "push_swap.h"
+
+static void	sort_three(t_ctx *c)
+{
+	int	x;
+	int	y;
+	int	z;
+
+	x = c->a.data[c->a.size - 1];
+	y = c->a.data[c->a.size - 2];
+	z = c->a.data[c->a.size - 3];
+	if (x > y && x > z && y < z)
+		op_ra(c);
+	else if (x > y && x > z && y > z)
+	{
+		op_ra(c);
+		op_sa(c);
+	}
+	else if (x < y && x > z)
+		op_rra(c);
+	else if (x < y && x < z && y > z)
+	{
+		op_ra(c);
+		op_sa(c);
+		op_rra(c);
+	}
+	else if (x > y && x < z && y < z)
+		op_sa(c);
+}
+
+static void	sort_four(t_ctx *c)
+{
+	int	idx;
+
+	idx = min_index(&c->a);
+	a_to_top(c, idx);
+	op_pb(c);
+	sort_three(c);
+	op_pa(c);
+}
+
+static void	sort_five(t_ctx *c)
+{
+	int	idx;
+
+	idx = min_index(&c->a);
+	a_to_top(c, idx);
+	op_pb(c);
+	idx = min_index(&c->a);
+	a_to_top(c, idx);
+	op_pb(c);
+	sort_three(c);
+	op_pa(c);
+	op_pa(c);
+}
+
+void	sort_small(t_ctx *c)
+{
+	if (quick_fix(c))
+		return ;
+	if (c->a.size == 2)
+		op_sa(c);
+	else if (c->a.size == 3)
+		sort_three(c);
+	else if (c->a.size == 4)
+		sort_four(c);
+	else if (c->a.size == 5)
+		sort_five(c);
+}
+
+int	quick_fix(t_ctx *c)
+{
+	int	ok;
+
+	stack_swap(&c->a);
+	ok = is_sorted(&c->a, c->a.size);
+	stack_swap(&c->a);
+	if (ok)
+		return (op_sa(c), 1);
+	stack_rotate(&c->a);
+	ok = is_sorted(&c->a, c->a.size);
+	stack_rrotate(&c->a);
+	if (ok)
+		return (op_ra(c), 1);
+	stack_rrotate(&c->a);
+	ok = is_sorted(&c->a, c->a.size);
+	stack_rotate(&c->a);
+	if (ok)
+		return (op_rra(c), 1);
+	return (0);
+}
